@@ -41,6 +41,6 @@ def anms(cimg, max_pts):
   distanceSorted = np.flip(distanceSorted,axis=0)
   topN = distanceSorted[:N,:2]
   rmax = distanceSorted[N-1,2]
-  x = topN[:,0]
-  y = topN[:,1]
+  y = topN[:,0]
+  x = topN[:,1]
   return x, y, rmax
