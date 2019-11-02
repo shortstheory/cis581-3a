@@ -32,7 +32,7 @@ def est_homography(x, y, X, Y):
     A[2 * i : 2 * i + 2, 6 : ] = d
 
     i += 1
-  
+
   # compute the solution of A
   U, s, V = np.linalg.svd(A, full_matrices=True)
   h = V[8, :]
