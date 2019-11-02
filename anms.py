@@ -14,7 +14,7 @@
     - Output y: N × 1 vector representing the row coordinates of corners.
     - Output rmax: suppression radius used to get max pts corners.
 '''
-
+import numpy as np
 def anms(cimg, max_pts):
   N = max_pts
   keypt = np.asarray(np.nonzero(cimg)).T

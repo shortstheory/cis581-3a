@@ -1,3 +1,6 @@
+import numpy as np
+import cv2
+
 '''
   File name: feat_desc.py
   Author:
@@ -16,5 +19,9 @@
 '''
 
 def feat_desc(img, x, y):
-  # Your Code Here
-  return descs
+    sift = cv2.xfeatures2d.SIFT_create()
+    kp=[]
+    for (_x,_y) in zip(x,y):
+        kp.append(cv2.KeyPoint(_x,_y,40))
+    kp,descs = sift.compute(img,kp)
+    return descs
