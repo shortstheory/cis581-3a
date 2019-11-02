@@ -1,3 +1,6 @@
+import cv2
+import numpy as np
+
 '''
   File name: feat_match.py
   Author:
@@ -15,5 +18,10 @@
 '''
 
 def feat_match(descs1, descs2):
-  # Your Code Here
-  return match
+    matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+    matches = matcher.knnMatch(descs1, descs2, 2)
+    match = []
+    for d1,d2 in matches:
+        if d1.distance < 1*d2.distance:
+            match.append(d1)
+    return match
