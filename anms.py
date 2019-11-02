@@ -16,5 +16,31 @@
 '''
 
 def anms(cimg, max_pts):
-  # Your Code Here
+  N = max_pts
+  keypt = np.asarray(np.nonzero(cimg)).T
+  keyR = cimg[np.nonzero(cimg)]
+  keypts = np.zeros([keypt.shape[0],3])
+  keypts[:,:2]=keypt
+  keypts[:,2]= keyR
+  distance = np.zeros(keypts.shape)
+  distance[:,:2]=keypts[:,:2]
+  maxdist = np.sqrt(cimg.shape[0]**2 + cimg.shape[1]**2)
+
+  for i in range(keypts.shape[0]):
+    condind = np.argwhere(np.logical_and(keyR[:]>keyR[i],keyR[:]<1.5*keyR[i])==1)
+    condind = condind[:,0]
+    condpts = keypts[condind,:]
+    if (condpts.shape[0]!=0):
+      dist = np.sqrt((condpts[:,0]-keypts[i,0])**2 + (condpts[:,1]-keypts[i,1])**2)
+      minD = dist.min()
+      distance[i,2]=minD
+    else:
+      distance[i,2] = maxdist
+
+  distanceSorted = a = distance[distance[:,2].argsort(kind='mergesort')]
+  distanceSorted = np.flip(distanceSorted,axis=0)
+  topN = distanceSorted[:N,:2]
+  rmax = distanceSorted[N-1,2]
+  x = topN[:,0]
+  y = topN[:,1]
   return x, y, rmax
