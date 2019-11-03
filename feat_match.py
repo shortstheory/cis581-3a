@@ -21,9 +21,11 @@ def feat_match(descs1, descs2):
     matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
     matches = matcher.knnMatch(descs1, descs2, 2)
     match = []
+    dMatch = []
     for d1,d2 in matches:
         if d1.distance < 0.7*d2.distance:
             match.append(d1.trainIdx)
+            dMatch.append(d1)
         else:
             match.append(-1)
-    return match
+    return match,dMatch
