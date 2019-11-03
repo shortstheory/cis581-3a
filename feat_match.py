@@ -22,6 +22,8 @@ def feat_match(descs1, descs2):
     matches = matcher.knnMatch(descs1, descs2, 2)
     match = []
     for d1,d2 in matches:
-        if d1.distance < 1*d2.distance:
-            match.append(d1)
+        if d1.distance < 0.7*d2.distance:
+            match.append(d1.trainIdx)
+        else:
+            match.append(-1)
     return match
