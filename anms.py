@@ -16,8 +16,8 @@
 '''
 import numpy as np
 def anms(cimg, max_pts):
-  N = max_pts
   keypt = np.asarray(np.nonzero(cimg)).T
+  N = min(max_pts,keypt.shape[0])
   keyR = cimg[np.nonzero(cimg)]
   keypts = np.zeros([keypt.shape[0],3])
   keypts[:,:2]=keypt
