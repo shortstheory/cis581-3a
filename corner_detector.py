@@ -16,14 +16,16 @@ import numpy as np
 
 def corner_detector(img):
     # Your Code Here
-    # cimg = cv2.cornerHarris(img,2,3,0.04)
-    # cimg[cimg<0.01*cimg.max()]=0
+    cimg = cv2.cornerHarris(img,2,3,0.04)
+    cimg[cimg<0.01*cimg.max()]=0
+    res=np.zeros((cimg.shape))
+    res[20:cimg.shape[0]-20,20:cimg.shape[1]-20] = cimg[20:cimg.shape[0]-20,20:cimg.shape[1]-20]
+    return res
+    # sift = cv2.xfeatures2d.SIFT_create()
+    # keypoints = sift.detect(img,None)
+    # cimg = np.zeros((img.shape))
+    # print(len(keypoints))
+    # for kp in keypoints:
+    #     # print(kp.pt)
+    #     cimg[round(kp.pt[1])][round(kp.pt[0])] = max(cimg[round(kp.pt[1])][round(kp.pt[0])],kp.response)
     # return cimg
-    sift = cv2.xfeatures2d.SIFT_create()
-    keypoints = sift.detect(img,None)
-    cimg = np.zeros((img.shape))
-    print(len(keypoints))
-    for kp in keypoints:
-        # print(kp.pt)
-        cimg[round(kp.pt[1])][round(kp.pt[0])] = max(cimg[round(kp.pt[1])][round(kp.pt[0])],kp.response)
-    return cimg

@@ -19,7 +19,7 @@ def ransac_est_homography(x, y, X, Y, threshold):
     # Your Code Here
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 10
+    ranIter = 10000
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
@@ -66,23 +66,15 @@ def ransac_est_homography(x, y, X, Y, threshold):
         vPtsPred = np.matmul(H,uPtsFull)
         vPtsPred = vPtsPred/vPtsPred[-1,:]
         distances = np.sqrt(((vPtsPred-vPtsFull)**2).sum(axis=0))
-        # print(distances)
         dSum = np.sum(distances[distances<threshold])
         inliers = 1*np.less_equal(distances,threshold)
         inlierCount = np.sum(1*inliers)
-        if maxInlierCount<=inlierCount:
+        if (maxInlierCount == inlierCount and distanceSum>dSum) or maxInlierCount<inlierCount:
             maxInlierCount = inlierCount
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
-            if (maxInlierCount==1):
-                # print(ptindices)
-                print("Ht: ", end=" ")
-                print(Ht)
-                print(distances)
-                print("This value should be close to zero: "+str(np.sum(np.matmul(At,Ht))))
-                print(backup)
             distanceSum = dSum
-            # print(dSum)
+            print(dSum)
     ptindices = ptindices[:,0]
     # print(maxInlierCount)
     Anew = np.zeros([2*ptindices.shape[0],9])
@@ -94,5 +86,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
     U, s, V = np.linalg.svd(Anew, full_matrices=True)
     h = V[-1, :]/V[-1,-1]
     # print(h)
+    print("MaxInlierCount" + str(maxInlierCount))
     H = h.reshape(3, 3)
     return H, inlier_ind
