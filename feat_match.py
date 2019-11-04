@@ -18,19 +18,22 @@ import numpy as np
 '''
 
 # def feat_match(descs1, descs2):
-#     matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
-#     matches = matcher.knnMatch(descs1, descs2, 2)
-#     match = []
-#     for d1,d2 in matches:
-#         if d1.distance < 0.7*d2.distance:
-#             match.append(d1.trainIdx)
-#             dMatch.append(d1)
-#         else:
-#             match.append(-1)
-#     return match,dMatch
+    # matcher = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+    # matches = matcher.knnMatch(descs1.T, descs2.T, 2)
+    # match = []
+    # dMatch = []
+    # for d1,d2 in matches:
+    #     if d1.distance < 0.7*d2.distance:
+    #         match.append(d1.trainIdx)
+    #         dMatch.append(d1)
+    #     else:
+    #         match.append(-1)
+    # return match,dMatch
 def feat_match(descs1, descs2):
     match = []
     dMatch = []
+    descs1 = descs1.T
+    descs2 = descs2.T
     for desc in descs1:
         diff = descs2-desc
         norms = np.linalg.norm(diff,axis=1)

@@ -18,10 +18,27 @@ import cv2
     - Outpuy descs: 64 × N matrix, with column i being the 64 dimensional descriptor (8 × 8 grid linearized) computed at location (xi , yi) in img.
 '''
 
+# def feat_desc(img, x, y):
+#     sift = cv2.xfeatures2d.SIFT_create()
+#     kp=[]
+#     for (_x,_y) in zip(x,y):
+#         kp.append(cv2.KeyPoint(_x,_y,40))
+#     kp,descs = sift.compute(img,kp)
+#     print()
+#     return descs
 def feat_desc(img, x, y):
-    sift = cv2.xfeatures2d.SIFT_create()
-    kp=[]
+    descs=np.zeros((64,len(x)))
+    padImage = np.zeros((img.shape[0]+40,img.shape[1]+40))
+    padImage[20:img.shape[0]+20,20:img.shape[1]+20] = img
+    # print(padImage)
+    i = 0
     for (_x,_y) in zip(x,y):
-        kp.append(cv2.KeyPoint(_x,_y,40))
-    kp,descs = sift.compute(img,kp)
+        _x = int(_x)
+        _y = int(_y)
+        patch = padImage[_y:_y+40,_x:_x+40]
+        blurredPatch = cv2.GaussianBlur(patch,(5,5),1)
+        desc = blurredPatch[::5,::5].flatten()
+        desc = (desc - desc.mean())/desc.std()
+        descs[:,i]=desc
+        i=i+1
     return descs
