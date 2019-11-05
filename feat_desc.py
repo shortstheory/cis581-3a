@@ -35,10 +35,10 @@ def findDerivatives(I_gray):
 
     # convolution of dx,dy with the Gaussian is equivalent to taking dx,dy with the smoothened image
     dx,dy = np.gradient(G, axis = (1,0))
-    # Magx = signal.convolve2d(I_gray, dx, 'same')
-    # Magy = signal.convolve2d(I_gray, dy, 'same')
-    Magx = signal.convolve2d(I_gray, [[-1,0,1],[-2,0,2],[-1,0,1]], 'same')
-    Magy = signal.convolve2d(I_gray, [[-1,-2,-1],[0,0,0],[1,2,1]], 'same')
+    Magx = signal.convolve2d(I_gray, dx, 'same')
+    Magy = signal.convolve2d(I_gray, dy, 'same')
+    # Magx = signal.convolve2d(I_gray, [[-1,0,1],[-2,0,2],[-1,0,1]], 'same')
+    # Magy = signal.convolve2d(I_gray, [[-1,-2,-1],[0,0,0],[1,2,1]], 'same')
     Mag = np.sqrt(Magx*Magx + Magy*Magy)
 
     # gives us the direction of the gradient at a pixel

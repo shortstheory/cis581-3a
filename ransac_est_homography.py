@@ -45,6 +45,7 @@ def ransac_est_homography(x, y, X, Y, threshold):
   # compute the solution of A
     ptindices = []
     inlier_ind = []
+    H1 = np.zeros([3,3])
     for i in range(ranIter):
         At = np.zeros([8,9])
         indexList = list(range(N))
@@ -65,7 +66,9 @@ def ransac_est_homography(x, y, X, Y, threshold):
         H = Ht.reshape(3,3)
         vPtsPred = np.matmul(H,uPtsFull)
         vPtsPred = vPtsPred/vPtsPred[-1,:]
-        distances = np.sqrt(((vPtsPred-vPtsFull)**2).sum(axis=0))
+        # distances = np.sqrt(((vPtsPred-vPtsFull)**2).sum(axis=0))
+        distances = np.linalg.norm(vPtsFull-vPtsPred,axis=0)
+        # print(distances)
         inliers = 1*np.less_equal(distances,threshold)
         dSum = np.sum(distances)
         # dSum = np.sum(distances[inliers])
@@ -75,7 +78,9 @@ def ransac_est_homography(x, y, X, Y, threshold):
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
             distanceSum = dSum
-            print(dSum)
+            # print(dSum)
+            H1 = H
+            print(H)
     ptindices = ptindices[:,0]
     # print(maxInlierCount)
     Anew = np.zeros([2*ptindices.shape[0],9])
@@ -89,4 +94,5 @@ def ransac_est_homography(x, y, X, Y, threshold):
     # print(h)
     print("MaxInlierCount" + str(maxInlierCount))
     H = h.reshape(3, 3)
+    print(str("Final H")+str(H))
     return H, inlier_ind
