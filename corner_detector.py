@@ -18,7 +18,9 @@ def corner_detector(img):
     # Your Code Here
     cimg = cv2.cornerHarris(img,2,3,0.04)
     cimg[cimg<0.01*cimg.max()]=0
-    return cimg
+    res=np.zeros((cimg.shape))
+    res[20:cimg.shape[0]-20,20:cimg.shape[1]-20] = cimg[20:cimg.shape[0]-20,20:cimg.shape[1]-20]
+    return res
     # sift = cv2.xfeatures2d.SIFT_create()
     # keypoints = sift.detect(img,None)
     # cimg = np.zeros((img.shape))
