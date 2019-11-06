@@ -38,7 +38,7 @@ def feat_match(descs1, descs2):
 #         diff = descs2-desc
 #         norms = np.linalg.norm(diff,axis=1)
 #         idxs = norms.argsort()
-#         if norms[idxs[0]] < 0.7*norms[idxs[1]]:
+#         if norms[idxs[0]] < 0.8*norms[idxs[1]]:
 #             dMatch.append(cv2.DMatch(len(match),idxs[0],norms[idxs[0]]))
 #             match.append(idxs[0])
 #         else:

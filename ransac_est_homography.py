@@ -18,7 +18,7 @@ import numpy as np
 def ransac_est_homography(x, y, X, Y, threshold):
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 1000
+    ranIter = 10000
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
@@ -67,6 +67,7 @@ def ransac_est_homography(x, y, X, Y, threshold):
     ptindices = ptindices[:,0]
     j=0
     Anew = np.zeros([2*ptindices.shape[0],9])
+    print(ptindices.shape)
     for i in range(ptindices.shape[0]):
         Anew[2*j,:] = A[2*ptindices[i],:]
         Anew[2*j+1,:] = A[2*ptindices[i]+1,:]
