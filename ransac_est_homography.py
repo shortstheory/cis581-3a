@@ -18,7 +18,7 @@ import numpy as np
 def ransac_est_homography(x, y, X, Y, threshold):
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 10000
+    ranIter = 100
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
@@ -59,7 +59,13 @@ def ransac_est_homography(x, y, X, Y, threshold):
         distances = np.linalg.norm(vPtsFull-vPtsPred,axis=0)
         inliers = 1*np.less_equal(distances,threshold)
         inlierCount = np.sum(1*inliers)
+        a = H[0,0]-1
+        b = H[1,1]-1
+        l2norm = np.linalg.norm(np.array([a,b]))
+        # if l2norm<0.1:
         if maxInlierCount<inlierCount:
+            print("Norm:- ", end= " ")
+            print(H)
             maxInlierCount = inlierCount
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
