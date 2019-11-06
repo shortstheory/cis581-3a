@@ -65,7 +65,7 @@ def feat_desc(img, x, y):
         for i in range(0,40,5):
             for j in range(0,40,5):
                 smallPatch = patch[i:i+5,j:j+5]
-                maxValue=np.max(smallPatch.flatten())
+                maxValue=np.mean(smallPatch.flatten())
                 desc.append(maxValue)
         desc = np.array(desc)
         desc = (desc - desc.mean())/desc.std()
