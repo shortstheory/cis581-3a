@@ -16,10 +16,9 @@
 '''
 import numpy as np
 def ransac_est_homography(x, y, X, Y, threshold):
-    # Your Code Here
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 50000
+    ranIter = 1000
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
@@ -30,7 +29,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
     vPtsFull = np.vstack([vx,vy,vz])
     i = 0
     maxInlierCount = 0
-    distanceSum = 999999999
     # populates A with points
     while i < N:
         a = np.array([x[i], y[i], 1]).reshape(-1, 3)
@@ -39,10 +37,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
         A[2 * i, 0 : 3], A[2 * i + 1, 3 : 6]= a, a
         A[2 * i : 2 * i + 2, 6 : ] = d
         i += 1
-    # print("A Matrix: ", end=" ")
-    # print(A)
-    # print("---------")
-  # compute the solution of A
     ptindices = []
     inlier_ind = []
     H1 = np.zeros([3,3])
@@ -54,43 +48,31 @@ def ransac_est_homography(x, y, X, Y, threshold):
             rnd = np.random.randint(0,len(indexList))
             ind = indexList.pop(rnd)
             backup.append(ind)
-            # print(ind,end=" ")
             At[2*j,:]=A[2*ind,:]
             At[2*j +1,:] = A[2*ind+1,:]
-        # print("")
-        # print(At)
         [u,d,v] = np.linalg.svd(At,full_matrices=True)
         minIdx = np.min(d)
-        # print(minIdx)
         Ht = v[-1,:]/v[-1,-1]
         H = Ht.reshape(3,3)
         vPtsPred = np.matmul(H,uPtsFull)
         vPtsPred = vPtsPred/vPtsPred[-1,:]
-        # distances = np.sqrt(((vPtsPred-vPtsFull)**2).sum(axis=0))
         distances = np.linalg.norm(vPtsFull-vPtsPred,axis=0)
-        # print(distances)
         inliers = 1*np.less_equal(distances,threshold)
-        dSum = np.sum(distances)
-        # dSum = np.sum(distances[inliers])
         inlierCount = np.sum(1*inliers)
-        if (maxInlierCount == inlierCount and distanceSum>dSum) or maxInlierCount<inlierCount:
+        if maxInlierCount<inlierCount:
             maxInlierCount = inlierCount
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
-            distanceSum = dSum
-            # print(dSum)
             H1 = H
     ptindices = ptindices[:,0]
-    # print(maxInlierCount)
-    Anew = np.zeros([2*ptindices.shape[0],9])
     j=0
+    Anew = np.zeros([2*ptindices.shape[0],9])
     for i in range(ptindices.shape[0]):
         Anew[2*j,:] = A[2*ptindices[i],:]
         Anew[2*j+1,:] = A[2*ptindices[i]+1,:]
         j=j+1
     U, s, V = np.linalg.svd(Anew, full_matrices=True)
     h = V[-1, :]/V[-1,-1]
-    # print(h)
     print("MaxInlierCount" + str(maxInlierCount))
     H = h.reshape(3, 3)
     print(str("Final H")+str(H))
