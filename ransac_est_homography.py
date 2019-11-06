@@ -15,10 +15,11 @@
     - Output inlier_ind: N × 1 vector representing if the correspondence is inlier or not. 1 means inlier, 0 means outlier.
 '''
 import numpy as np
+import sys
 def ransac_est_homography(x, y, X, Y, threshold):
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 100
+    ranIter = 10000
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
@@ -29,6 +30,7 @@ def ransac_est_homography(x, y, X, Y, threshold):
     vPtsFull = np.vstack([vx,vy,vz])
     i = 0
     maxInlierCount = 0
+    minDistanceSum = sys.maxsize
     # populates A with points
     while i < N:
         a = np.array([x[i], y[i], 1]).reshape(-1, 3)
@@ -59,14 +61,13 @@ def ransac_est_homography(x, y, X, Y, threshold):
         distances = np.linalg.norm(vPtsFull-vPtsPred,axis=0)
         inliers = 1*np.less_equal(distances,threshold)
         inlierCount = np.sum(1*inliers)
-        a = H[0,0]-1
-        b = H[1,1]-1
-        l2norm = np.linalg.norm(np.array([a,b]))
-        # if l2norm<0.1:
-        if maxInlierCount<inlierCount:
+        distanceSum = np.sum(distances)
+        if (maxInlierCount==inlierCount and distanceSum < minDistanceSum) or maxInlierCount<inlierCount:
             print("Norm:- ", end= " ")
             print(H)
+            print(distanceSum)
             maxInlierCount = inlierCount
+            minDistanceSum = distanceSum
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
             H1 = H
