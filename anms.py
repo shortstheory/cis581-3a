@@ -27,7 +27,7 @@ def anms(cimg, max_pts):
   maxdist = np.sqrt(cimg.shape[0]**2 + cimg.shape[1]**2)
 
   for i in range(keypts.shape[0]):
-    condind = np.argwhere(np.logical_and(keyR[:]>keyR[i],keyR[:]<1.4*keyR[i])==1)
+    condind = np.argwhere(np.logical_and(keyR[:]>keyR[i],keyR[:]<1.3*keyR[i])==1)
     condind = condind[:,0]
     condpts = keypts[condind,:]
     if (condpts.shape[0]!=0):
