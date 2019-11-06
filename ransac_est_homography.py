@@ -80,7 +80,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
             distanceSum = dSum
             # print(dSum)
             H1 = H
-            print(H)
     ptindices = ptindices[:,0]
     # print(maxInlierCount)
     Anew = np.zeros([2*ptindices.shape[0],9])
