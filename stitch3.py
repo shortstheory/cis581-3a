@@ -32,44 +32,45 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     T = [[1, 0, offsetX], [0, 1, offsetY], [0, 0, 1]]
 
     canvasR = cv2.warpPerspective(imgR, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
-    imgRMask = cv2.warpPerspective(imgLMask, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
+    imgRMask = cv2.warpPerspective(imgRMask, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
 
     canvasL = canvasL#+canvasR
     canvasM = np.zeros((canvasL.shape))
     canvasImg = np.zeros((canvasL.shape))
-    canvasM[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=imgM
+    canvasM[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=imgM   
 
     imgMMask = np.zeros((imgLMask.shape))
     imgMMask[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=1
 
     imgLMMask = (imgLMask*imgMMask)#.astype('bool')
-    imgRMMask = (imgRMask*(imgMMask))
-    plt.imshow(imgLMask)
-    plt.show()
-    plt.imshow(imgMMask)
-    plt.show()
+    imgRMMask = (imgRMask*(imgMMask+imgLMask))
+    # plt.imshow(imgLMask)
+    # plt.show()
+    # plt.imshow(imgMMask)
+    # plt.show()
+    # plt.imshow(imgRMask)
+    # plt.show()
+
+    # plt.imshow(imgLMMask)
+    # plt.show()
     plt.imshow(imgRMask)
     plt.show()
-
-    plt.imshow(imgLMMask)
+    plt.imshow(canvasR)
     plt.show()
-    plt.imshow(imgRMMask)
-    plt.show()
-    plt.imshow((imgLMask+imgMMask))
-    plt.show()
-
+    # plt.imshow((imgLMask+imgMMask))
+    # plt.show()
     imgLMMask = imgLMMask.astype('bool')
     imgRMMask = imgRMMask.astype('bool')
     alpha = 0.5
-    imgLMask[imgLMMask] = alpha
-    imgMMask[imgLMMask] = 1-alpha
-    imgMMask[imgRMMask] = alpha
-    # imgRMask[imgRMMask] = 1-alpha
-    canvasImg = imgLMask*canvasL+imgMMask*canvasM+imgRMask*canvasR
-    canvasL[imgLMMask] = alpha*canvasL[imgLMMask]
-    canvasM[imgLMMask] = (1-alpha)*canvasM[imgLMMask]
     canvasImg = canvasL+canvasM
-    # canvasImg[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
+    canvasImg[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
+    canvasImg[imgRMMask] = alpha*canvasImg[imgRMMask]
+    canvasR[imgRMMask] = (1-alpha)*canvasR[imgRMMask]
+    canvasImg=canvasImg+canvasR
+    return canvasImg
+
+
+
     #+canvasR
     # multimaskLMM = imgLMMask*alpha
     # multimaskRMM = imgRMMask*
@@ -77,8 +78,11 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
 
     # canvasL[imgRMMask] = (1-alpha)*canvasR[imgRMMask]+alpha*canvasL[imgRMMask]
     # canvasR[imgRMMask] = 0
-    return canvasImg
 
-
-
-
+    # imgLMask[imgLMMask] = alpha
+    # imgMMask[imgLMMask] = 1-alpha
+    # imgMMask[imgRMMask] = alpha
+    # imgRMask[imgRMMask] = 1-alpha
+    # canvasImg = imgMMask*canvasM+imgLMask*canvasL#+imgRMask*canvasR
+    # canvasL[imgLMMask] = alpha*canvasL[imgLMMask]
+    # canvasM[imgLMMask] = (1-alpha)*canvasM[imgLMMask]
