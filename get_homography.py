@@ -34,7 +34,6 @@ def get_homography(img1, img2):
     y1=[]
     x2=[]
     y2=[]
-
     for k,idx in enumerate(m):
         if (idx != -1):
             x1.append(X1[k])
