@@ -14,5 +14,4 @@
 '''
 
 def mymosaic(img_input):
-  # Your Code Here
-  return img_mosaic
+    return img_mosaic
