@@ -2,10 +2,13 @@ import numpy as np
 import cv2
 from scipy import signal
 import math
+from matplotlib import pyplot as plt
+
 
 def stitch_image(img1, img2, H):
-    left = math.floor(-1*H[0,2])
-    top = math.floor(-1*H[1,2])
+    left = math.ceil(-1*H[0,2])
+    top = max(math.ceil(-1*H[1,2]),0)
+
     H[0,2] = 0
     H[1,2] = 0
 
@@ -21,10 +24,12 @@ def stitch_image(img1, img2, H):
     print(new_lr)
     scale_ratio = y_scale/img2.shape[0]
     print(scale_ratio)
-    H_img2 = np.array([[scale_ratio,0,0],[0,scale_ratio,0],[0,0,1]])
+    H_img2 = np.array([[scale_ratio,0,0],[0,scale_ratio,top],[0,0,1]])
     print(H_img2)
-    scaled_img = cv2.warpPerspective(img2, H_img2,(int(img2.shape[1]*scale_ratio), int(img2.shape[0]*scale_ratio)))
-    canvas[top+2:2+top+scaled_img.shape[0],left:left+scaled_img.shape[1]] = scaled_img
-    # canvas[top:top+img2.shape[0],left:left+img2.shape[1]] = img2
+    print(canvas.shape)
+    scaled_img = cv2.warpPerspective(img2, H_img2,(int(img2.shape[1]*scale_ratio), int(img2.shape[0]*scale_ratio)+top))
+    plt.imshow(scaled_img)
+    canvas[0:scaled_img.shape[0],left:left+scaled_img.shape[1]] = scaled_img
+    # canvas[0:0+img2.shape[0],left:left+img2.shape[1]] = img2
 
     return canvas,scaled_img

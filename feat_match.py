@@ -23,7 +23,7 @@ def feat_match(descs1, descs2):
     match = []
     dMatch = []
     for d1,d2 in matches:
-        if d1.distance < 0.8*d2.distance:
+        if d1.distance < 0.7*d2.distance:
             match.append(d1.trainIdx)
             dMatch.append(d1)
         else:

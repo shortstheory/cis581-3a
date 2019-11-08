@@ -63,9 +63,9 @@ def ransac_est_homography(x, y, X, Y, threshold):
         inlierCount = np.sum(1*inliers)
         distanceSum = np.sum(distances)
         if (maxInlierCount==inlierCount and distanceSum < minDistanceSum) or maxInlierCount<inlierCount:
-            print(H)
-            print(distanceSum,end=" ")
-            print(inlierCount)
+            # print(H)
+            # print(distanceSum,end=" ")
+            # print(inlierCount)
             maxInlierCount = inlierCount
             minDistanceSum = distanceSum
             ptindices = np.argwhere(inliers==1)
