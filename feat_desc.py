@@ -17,37 +17,16 @@ from scipy import signal
     - Input y: N × 1 vector representing the row coordinates of corners.
     - Outpuy descs: 64 × N matrix, with column i being the 64 dimensional descriptor (8 × 8 grid linearized) computed at location (xi , yi) in img.
 '''
-# -------------------------------------
-# SIFT
-# -------------------------------------
 
-# def feat_desc(img, x, y):
-#     sift = cv2.xfeatures2d.SIFT_create()
-#     kp=[]
-#     for (_x,_y) in zip(x,y):
-#         kp.append(cv2.KeyPoint(_x,_y,40))
-#     kp,descs = sift.compute(img,kp)
-#     print()
-#     return descs
 def findDerivatives(I_gray):
-    # using the Gaussian kernel taught in class
     G = 1/159.0*np.array([[2, 4, 5, 4, 2], [4, 9, 12, 9, 4], [5, 12, 15, 12, 5], [4, 9, 12, 9, 4], [2, 4, 5, 4, 2]])
-
-    # convolution of dx,dy with the Gaussian is equivalent to taking dx,dy with the smoothened image
     dx,dy = np.gradient(G, axis = (1,0))
     Magx = signal.convolve2d(I_gray, dx, 'same')
     Magy = signal.convolve2d(I_gray, dy, 'same')
-    # Magx = signal.convolve2d(I_gray, [[-1,0,1],[-2,0,2],[-1,0,1]], 'same')
-    # Magy = signal.convolve2d(I_gray, [[-1,-2,-1],[0,0,0],[1,2,1]], 'same')
     Mag = np.sqrt(Magx*Magx + Magy*Magy)
 
-    # gives us the direction of the gradient at a pixel
     Ori = np.arctan2(Magy, Magx)
     return (Mag, Magx, Magy, Ori)
-
-# -------------------------------------
-# Gradient
-# -------------------------------------
 
 def feat_desc(img, x, y):
     Mag, Magx, Magy, Ori = findDerivatives(img)
@@ -65,7 +44,7 @@ def feat_desc(img, x, y):
         for i in range(0,40,5):
             for j in range(0,40,5):
                 smallPatch = patch[i:i+5,j:j+5]
-                maxValue=np.mean(smallPatch.flatten())
+                maxValue=np.max(smallPatch.flatten())
                 desc.append(maxValue)
         desc = np.array(desc)
         desc = (desc - desc.mean())/desc.std()
