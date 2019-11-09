@@ -13,11 +13,11 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
 
     cornersT = np.matmul(HLM,cornersL)
     cornersT = cornersT/cornersT[-1,:]
-    cornersT = cornersT.round()
-    xmax = int(np.max(cornersT[0,:]))
-    xmin = int(np.min(cornersT[0,:]))
-    ymax = int(np.max(cornersT[1,:]))
-    ymin = int(np.min(cornersT[1,:]))
+    cornersT = cornersT
+    xmax = np.max(cornersT[0,:])
+    xmin = np.min(cornersT[0,:])
+    ymax = np.max(cornersT[1,:])
+    ymin = np.min(cornersT[1,:])
     T = [[1, 0, max(0,-xmin)], [0, 1, max(0,-ymin)], [0, 0, 1]]
     imgLMask = np.ones((imgL.shape))
     imgRMask = np.ones((imgR.shape))
@@ -27,7 +27,9 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     imgOutline[imgOutline.shape[0]-1,0:imgOutline.shape[1]-1] = 1
     imgOutline[0:imgOutline.shape[0]-1,0] = 1
     imgOutline[0:imgOutline.shape[0]-1,imgOutline.shape[1]-1] = 1
-
+    print(T)
+    print(HLM)
+    print(T@HLM)
     canvasL = cv2.warpPerspective(imgL, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
     imgLMask = cv2.warpPerspective(imgLMask, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
     outlineL = cv2.warpPerspective(imgOutline, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
@@ -39,8 +41,8 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     # keep this here!
     imgMMask = np.zeros((imgLMask.shape))
 
-    _x = abs(max(0,-xmin))
-    _y = abs(max(0,-ymin))
+    _x = int(abs(max(0,-xmin)))
+    _y = int(abs(max(0,-ymin)))
 
     offsetX = int(_x)
     offsetY = int(_y)
