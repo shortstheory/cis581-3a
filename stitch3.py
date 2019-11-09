@@ -4,6 +4,7 @@ from scipy import signal
 import math
 from matplotlib import pyplot as plt
 import sys
+from scipy.ndimage import gaussian_filter
 sys.path.append('gradient_blending')
 from seamlessCloningPoisson import *
 
@@ -21,8 +22,19 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     imgLMask = np.ones((imgL.shape))
     imgRMask = np.ones((imgR.shape))
 
+    imgOutline = np.zeros((imgL.shape))
+    imgOutline[0,0:imgOutline.shape[1]-1] = 1
+    imgOutline[imgOutline.shape[0]-1,0:imgOutline.shape[1]-1] = 1
+    imgOutline[0:imgOutline.shape[0]-1,0] = 1
+    imgOutline[0:imgOutline.shape[0]-1,imgOutline.shape[1]-1] = 1
+
     canvasL = cv2.warpPerspective(imgL, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
     imgLMask = cv2.warpPerspective(imgLMask, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
+    outlineL = cv2.warpPerspective(imgOutline, T@HLM,(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
+
+    plt.imshow(outlineL)
+    plt.show()
+    outlineL = outlineL.astype('bool')
 
     # keep this here!
     imgMMask = np.zeros((imgLMask.shape))
@@ -36,6 +48,11 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
 
     canvasR = cv2.warpPerspective(imgR, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
     imgRMask = cv2.warpPerspective(imgRMask, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
+    outlineR = cv2.warpPerspective(imgOutline, T@np.linalg.inv(HMR),(int(imgL.shape[1]*2),int(imgL.shape[0]*1.5)))
+
+    plt.imshow(outlineR)
+    plt.show()
+    outlineR = outlineR.astype('bool')
 
     canvasL = canvasL#+canvasR
     canvasM = np.zeros((canvasL.shape))
@@ -45,8 +62,22 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     imgMMask = np.zeros((imgLMask.shape))
     imgMMask[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=1
 
-    imgLMMask = (imgLMask*imgMMask)#.astype('bool')
+    # _sigma = 0.5
+    # imgLMask = gaussian_filter(imgLMask, sigma=_sigma)
+    # imgMMask = gaussian_filter(imgMMask, sigma=_sigma)
+    # imgRMask = gaussian_filter(imgRMask, sigma=_sigma)
+
+    kernel = np.ones((3,3))
+    # imgLMask = cv2.dilate(imgLMask, kernel, iterations=10)
+    # imgMMask = cv2.dilate(imgMMask, kernel, iterations=10)
+    # imgRMask = cv2.dilate(imgRMask, kernel, iterations=10)
+
+
+    imgLMMask = (imgLMask*imgMMask)
     imgRMMask = (imgRMask*(imgMMask+imgLMask))
+
+    # imgLMMask = gaussian_filter(imgLMMask, sigma=_sigma)
+    # imgRMMask = gaussian_filter(imgRMMask, sigma=_sigma)
     # plt.imshow(imgLMask)
     # plt.show()
     # plt.imshow(imgMMask)
@@ -58,6 +89,8 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     # plt.show()
     plt.imshow(imgRMask)
     plt.show()
+    # plt.imshow(gaussian_filter(imgRMask,sigma=1))
+    # plt.show()
     plt.imshow(canvasR)
     plt.show()
     # plt.imshow((imgLMask+imgMMask))
@@ -71,14 +104,19 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     canvasR[imgRMMask] = (1-alpha)*canvasR[imgRMMask]
     canvasImgAlpha=canvasImgAlpha+canvasR
 
+
+    canvasImgAlpha[outlineL] = cv2.dilate(canvasImgAlpha.copy(),kernel,iterations=1)[outlineL.astype('bool')]
+    canvasImgAlpha[outlineR] = cv2.dilate(canvasImgAlpha.copy(),kernel,iterations=1)[outlineR.astype('bool')]
+    # canvasImgAlpha = cv2.dilate(canvasImgAlpha, kernel, iterations=1)
+    # canvasImgAlpha = gaussian_filter(canvasImgAlpha,sigma=01)
     canvasImgPoisson = canvasL+canvasM
-    overlap_img = np.zeros((canvasL.shape))
-    overlap_img[imgLMMask] = canvasL[imgLMMask]
-    canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgLMMask[:,:,0], 0, 0)
-    canvasImgPoisson = canvasImgPoisson+canvasR
-    overlap_img = np.zeros((canvasL.shape))
-    overlap_img[imgRMMask] = canvasR[imgRMMask]
-    canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgRMMask[:,:,0], 0, 0)
+    # overlap_img = np.zeros((canvasL.shape))
+    # overlap_img[imgLMMask] = canvasL[imgLMMask]
+    # canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgLMMask[:,:,0], 0, 0)
+    # canvasImgPoisson = canvasImgPoisson+canvasR
+    # overlap_img = np.zeros((canvasL.shape))
+    # overlap_img[imgRMMask] = canvasR[imgRMMask]
+    # canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgRMMask[:,:,0], 0, 0)
 
     return canvasImgAlpha,canvasImgPoisson
 
