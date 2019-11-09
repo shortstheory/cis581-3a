@@ -37,7 +37,7 @@ def anms(cimg, max_pts):
         else:
             distance[i,2] = maxdist
 
-    distanceSorted = a = distance[distance[:,2].argsort(kind='mergesort')]
+    distanceSorted = distance[distance[:,2].argsort(kind='mergesort')]
     distanceSorted = np.flip(distanceSorted,axis=0)
     topN = distanceSorted[:N,:2]
     rmax = distanceSorted[N-1,2]
