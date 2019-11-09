@@ -7,7 +7,7 @@ import sys
 from scipy.ndimage import gaussian_filter
 sys.path.append('gradient_blending')
 from seamlessCloningPoisson import *
-from getHomographedImg import *
+from warp_image import *
 
 def stitch_neo(imgL, imgM, imgR, HLM, HMR):
     cornersL = np.asarray([[0,0,1],[0,imgL.shape[0],1],[imgL.shape[1],0,1],[imgL.shape[1],imgL.shape[0],1]]).T
@@ -29,9 +29,9 @@ def stitch_neo(imgL, imgM, imgR, HLM, HMR):
     imgOutline[0:imgOutline.shape[0]-1,0] = 1
     imgOutline[0:imgOutline.shape[0]-1,imgOutline.shape[1]-1] = 1
 
-    canvasL = getHomographedImg(imgL, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
-    imgLMask = getHomographedImg(imgLMask, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
-    outlineL = getHomographedImg(imgOutline, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    canvasL = warp_image(imgL, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    imgLMask = warp_image(imgLMask, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    outlineL = warp_image(imgOutline, T@HLM,int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
 
     outlineL = outlineL.astype('bool')
 
@@ -44,9 +44,9 @@ def stitch_neo(imgL, imgM, imgR, HLM, HMR):
     offsetY = int(_y)
     T = [[1, 0, offsetX], [0, 1, offsetY], [0, 0, 1]]
 
-    canvasR = getHomographedImg(imgR, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
-    imgRMask = getHomographedImg(imgRMask, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
-    outlineR = getHomographedImg(imgOutline, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    canvasR = warp_image(imgR, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    imgRMask = warp_image(imgRMask, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
+    outlineR = warp_image(imgOutline, T@np.linalg.inv(HMR),int(imgL.shape[1]*2),int(imgL.shape[0]*1.5))
     outlineR = outlineR.astype('bool')
 
     canvasM = np.zeros((canvasL.shape))

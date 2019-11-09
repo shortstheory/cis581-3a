@@ -52,7 +52,7 @@ def interp2(v, xq, yq):
     return interp_val
 
 
-def getHomographedImg(img1,H,shape0, shape1):
+def warp_image(img1,H,shape0, shape1):
     x_r = np.array(range(shape0))
     y_r = np.array(range(shape1))
 

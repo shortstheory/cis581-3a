@@ -10,11 +10,11 @@ from cylindrical_projection import *
 from stitch_image import *
 from warp_img_perspective import *
 
+# Finds a homography to transform img1 -> img2
 def get_homography(img1, img2):
     max_anms=4000
     gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
     c = corner_detector(gray)
-    print(np.sum(c>0))
     X1,Y1,rmax=anms(c, max_anms)
     d1 = feat_desc(gray,X1,Y1)
     kp1=[]
@@ -22,7 +22,6 @@ def get_homography(img1, img2):
         kp1.append(cv2.KeyPoint(_x,_y,40))
     gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
     c = corner_detector(gray)
-    print(np.sum(c>0))
     X2,Y2,rmax=anms(c, max_anms)
     d2 = feat_desc(gray,X2,Y2)
     print("Rmax" + str(rmax))
