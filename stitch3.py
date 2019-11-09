@@ -75,6 +75,7 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
 
     imgLMMask = (imgLMask*imgMMask)
     imgRMMask = (imgRMask*(imgMMask+imgLMask))
+    imgRMMask[np.nonzero(imgRMMask)] = 1
 
     # imgLMMask = gaussian_filter(imgLMMask, sigma=_sigma)
     # imgRMMask = gaussian_filter(imgRMMask, sigma=_sigma)
@@ -95,13 +96,65 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     plt.show()
     # plt.imshow((imgLMask+imgMMask))
     # plt.show()
+
+    # bounding box for LMMask
+    LMMaskStartX = np.min(np.argwhere(imgLMMask).T[1])
+    LMMaskEndX = np.max(np.argwhere(imgLMMask).T[1])+1
+    LMMaskStartY = np.min(np.argwhere(imgLMMask).T[0])
+    LMMaskEndY = np.max(np.argwhere(imgLMMask).T[0])+1
+
+    LMMAlphas = np.linspace(0,1,LMMaskEndX-LMMaskStartX)
+    LMMX, LMMY = np.meshgrid(LMMAlphas, np.arange(0,LMMaskEndY-LMMaskStartY))
+    print(LMMX.shape)
+    LMMmaskMultiplier = np.zeros((imgLMMask.shape))
+    LMMmaskMultiplier[LMMaskStartY:LMMaskEndY,LMMaskStartX:LMMaskEndX,0] = LMMX
+    LMMmaskMultiplier[LMMaskStartY:LMMaskEndY,LMMaskStartX:LMMaskEndX,1] = LMMX
+    LMMmaskMultiplier[LMMaskStartY:LMMaskEndY,LMMaskStartX:LMMaskEndX,2] = LMMX
+    plt.imshow(LMMmaskMultiplier)
+    plt.show()
+    plt.imshow(imgLMMask)
+    plt.show()
+    plt.imshow(imgLMMask*LMMmaskMultiplier)
+    plt.show()
+    plt.imshow(imgLMMask*(1-LMMmaskMultiplier))
+    plt.show()
+
+    RMMaskStartX = np.min(np.argwhere(imgRMMask).T[1])
+    RMMaskEndX = np.max(np.argwhere(imgRMMask).T[1])+1
+    RMMaskStartY = np.min(np.argwhere(imgRMMask).T[0])
+    RMMaskEndY = np.max(np.argwhere(imgRMMask).T[0])+1
+
+    RMMAlphas = np.linspace(0,1,RMMaskEndX-RMMaskStartX)
+    RMMX, RMMY = np.meshgrid(RMMAlphas, np.arange(0,RMMaskEndY-RMMaskStartY))
+    print(RMMX.shape)
+    RMMmaskMultiplier = np.zeros((imgRMMask.shape))
+    RMMmaskMultiplier[RMMaskStartY:RMMaskEndY,RMMaskStartX:RMMaskEndX,0] = RMMX
+    RMMmaskMultiplier[RMMaskStartY:RMMaskEndY,RMMaskStartX:RMMaskEndX,1] = RMMX
+    RMMmaskMultiplier[RMMaskStartY:RMMaskEndY,RMMaskStartX:RMMaskEndX,2] = RMMX
+    plt.imshow(RMMmaskMultiplier)
+    plt.show()
+    plt.imshow(imgRMMask)
+    plt.show()
+    plt.imshow(imgRMMask*RMMmaskMultiplier)
+    plt.show()
+    plt.imshow(imgRMMask*(1-RMMmaskMultiplier))
+    plt.show()
+
     imgLMMask = imgLMMask.astype('bool')
     imgRMMask = imgRMMask.astype('bool')
+
     alpha = 0.5
     canvasImgAlpha = canvasL+canvasM
-    canvasImgAlpha[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
-    canvasImgAlpha[imgRMMask] = alpha*canvasImgAlpha[imgRMMask]
-    canvasR[imgRMMask] = (1-alpha)*canvasR[imgRMMask]
+
+    canvasImgAlpha[imgLMMask] = (imgLMMask*LMMmaskMultiplier*canvasM+imgLMMask*(1-LMMmaskMultiplier)*canvasL)[imgLMMask]
+
+    # canvasImgAlpha[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
+    # canvasImgAlpha[imgRMMask] = alpha*canvasImgAlpha[imgRMMask]
+    # canvasR[imgRMMask] = (1-alpha)*canvasR[imgRMMask]
+
+    canvasR[imgRMMask] = (imgRMMask*(RMMmaskMultiplier)*canvasR)[imgRMMask]
+
+    canvasImgAlpha[imgRMMask] = (imgRMMask*(1-RMMmaskMultiplier)*canvasImgAlpha)[imgRMMask]
     canvasImgAlpha=canvasImgAlpha+canvasR
 
 
