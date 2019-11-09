@@ -3,6 +3,9 @@ import cv2
 from scipy import signal
 import math
 from matplotlib import pyplot as plt
+import sys
+sys.path.append('gradient_blending')
+from seamlessCloningPoisson import *
 
 def stitch3(imgL, imgM, imgR, HLM, HMR):
     cornersL = np.asarray([[0,0,1],[0,imgL.shape[0],1],[imgL.shape[1],0,1],[imgL.shape[1],imgL.shape[0],1]]).T
@@ -36,7 +39,7 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
 
     canvasL = canvasL#+canvasR
     canvasM = np.zeros((canvasL.shape))
-    canvasImg = np.zeros((canvasL.shape))
+    canvasImgAlpha = np.zeros((canvasL.shape))
     canvasM[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=imgM   
 
     imgMMask = np.zeros((imgLMask.shape))
@@ -62,12 +65,22 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     imgLMMask = imgLMMask.astype('bool')
     imgRMMask = imgRMMask.astype('bool')
     alpha = 0.5
-    canvasImg = canvasL+canvasM
-    canvasImg[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
-    canvasImg[imgRMMask] = alpha*canvasImg[imgRMMask]
+    canvasImgAlpha = canvasL+canvasM
+    canvasImgAlpha[imgLMMask] = alpha*canvasL[imgLMMask]+(1-alpha)*canvasM[imgLMMask]
+    canvasImgAlpha[imgRMMask] = alpha*canvasImgAlpha[imgRMMask]
     canvasR[imgRMMask] = (1-alpha)*canvasR[imgRMMask]
-    canvasImg=canvasImg+canvasR
-    return canvasImg
+    canvasImgAlpha=canvasImgAlpha+canvasR
+
+    canvasImgPoisson = canvasL+canvasM
+    overlap_img = np.zeros((canvasL.shape))
+    overlap_img[imgLMMask] = canvasL[imgLMMask]
+    canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgLMMask[:,:,0], 0, 0)
+    canvasImgPoisson = canvasImgPoisson+canvasR
+    overlap_img = np.zeros((canvasL.shape))
+    overlap_img[imgRMMask] = canvasR[imgRMMask]
+    canvasImgPoisson = seamlessCloningPoisson(overlap_img, canvasImgPoisson, imgRMMask[:,:,0], 0, 0)
+
+    return canvasImgAlpha,canvasImgPoisson
 
 
 
@@ -83,6 +96,6 @@ def stitch3(imgL, imgM, imgR, HLM, HMR):
     # imgMMask[imgLMMask] = 1-alpha
     # imgMMask[imgRMMask] = alpha
     # imgRMask[imgRMMask] = 1-alpha
-    # canvasImg = imgMMask*canvasM+imgLMask*canvasL#+imgRMask*canvasR
+    # canvasImgAlpha = imgMMask*canvasM+imgLMask*canvasL#+imgRMask*canvasR
     # canvasL[imgLMMask] = alpha*canvasL[imgLMMask]
     # canvasM[imgLMMask] = (1-alpha)*canvasM[imgLMMask]
