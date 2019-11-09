@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 
 def interp2(v, xq, yq):
-
     if len(xq.shape) == 2 or len(yq.shape) == 2:
         dim_input = 2
         q_h = xq.shape[0]
@@ -54,21 +53,8 @@ def interp2(v, xq, yq):
 
 
 def getHomographedImg(img1,H,shape0, shape1):
-#     corners = np.asarray([[0,0,1],[0,img1.shape[0],1],[img1.shape[1],0,1],[img1.shape[1],img1.shape[0],1]]).T
-#     cornersT = np.matmul(H,corners)
-#     cornersT = cornersT/cornersT[-1,:]
-#     cornersT = cornersT.round()
-#     xmax = int(np.max(cornersT[0,:]))
-#     xmin = int(np.min(cornersT[0,:]))
-#     ymax = int(np.max(cornersT[1,:]))
-#     ymin = int(np.min(cornersT[1,:]))
-#     sizex = int(xmax-xmin)
-#     sizey = int(ymax-ymin)
-#     print(xmin,xmax,ymin,ymax)
     x_r = np.array(range(shape0))
-#     x_r = x_r+xmin
     y_r = np.array(range(shape1))
-#     y_r = y_r+ymin
 
     x_co1,y_co1 = np.meshgrid(x_r,y_r)
     x_co = x_co1.flatten()
@@ -91,23 +77,10 @@ def getHomographedImg(img1,H,shape0, shape1):
     im1BT[outliers[:,0],outliers[:,1]]=0
     im1GT[outliers[:,0],outliers[:,1]]=0
     im1RT[outliers[:,0],outliers[:,1]]=0
-    # print('-------',outliers[:,1].max())
-    #print('-----',xmin)
-    #     cornersT2 = cornersT.copy()
-    #     print('cornerssss',cornersT)
-    #     cornersT2[0,:] = cornersT[0,:]-xmin
-    #     cornersT2[1,:] = cornersT[1,:]-ymin
-    #print(cornersT2)
-    #print(xmin)
+
     img1T = np.zeros([shape1,shape0,3])
     img1T[:,:,0] = im1BT
     img1T[:,:,1] = im1GT
     img1T[:,:,2] = im1RT
-    # print('image values', img1T[48-5,473-5,:])
-    # print(x_og.shape)
-    # print(outliersX1.shape)
-    # print(outliersX1[:,1].max())
-    plt.imshow(img1T.astype(int))
-    plt.show()
-    #print(xmax-xmin,xmin,ymax-ymin,ymin)
+
     return img1T
