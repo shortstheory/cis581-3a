@@ -13,6 +13,7 @@ from warp_img_perspective import *
 # Finds a homography to transform img1 -> img2
 def get_homography(img1, img2):
     max_anms=4000
+
     gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
     c = corner_detector(gray)
     X1,Y1,rmax=anms(c, max_anms)
@@ -24,7 +25,6 @@ def get_homography(img1, img2):
     c = corner_detector(gray)
     X2,Y2,rmax=anms(c, max_anms)
     d2 = feat_desc(gray,X2,Y2)
-    print("Rmax" + str(rmax))
     kp2=[]
     for (_x,_y) in zip(X2,Y2):
         kp2.append(cv2.KeyPoint(_x,_y,40))
