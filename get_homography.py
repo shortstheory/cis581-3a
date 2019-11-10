@@ -5,9 +5,7 @@ from corner_detector import *
 from anms import *
 from feat_match import *
 from ransac_est_homography import *
-from cylindrical_projection import *
-from stitch_image import *
-from warp_img_perspective import *
+from matplotlib import pyplot as plt
 
 # Finds a homography to transform img1 -> img2
 def get_homography(img1, img2, createPlots=True, imgNum=0):

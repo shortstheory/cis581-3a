@@ -5,8 +5,6 @@ import math
 from matplotlib import pyplot as plt
 import sys
 from scipy.ndimage import gaussian_filter
-sys.path.append('gradient_blending')
-from seamlessCloningPoisson import *
 from warp_image import *
 
 def mymosaic(imgL, imgM, imgR, HLM, HRM):
@@ -35,8 +33,7 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
 
     canvasMaxWidth = int(np.max(cornersRT[0:]))
     canvasMaxHeight = int(max(np.max(cornersRT[1:]),ymax))
-    print(canvasMaxWidth)
-    print(canvasMaxHeight)
+    print("Canvas Size: " + str(canvasMaxWidth)+"x"+str(canvasMaxHeight))
 
     imgLMask = np.ones((imgL.shape))
     imgRMask = np.ones((imgR.shape))
@@ -50,13 +47,6 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     canvasL = warp_image(imgL, T@HLM,canvasMaxWidth,canvasMaxHeight)
     imgLMask = warp_image(imgLMask, T@HLM,canvasMaxWidth,canvasMaxHeight)
     outlineL = warp_image(imgOutline, T@HLM,canvasMaxWidth,canvasMaxHeight)
-
-    # plt.imshow(cv2.cvtColor(canvasL,cv2.COLOR_BGR2RGB))
-    # plt.show()
-    plt.imshow(imgLMask)
-    plt.show()
-    plt.imshow(outlineL)
-    plt.show()
 
     outlineL = outlineL.astype('bool')
 
@@ -111,13 +101,6 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
 
     alpha = 0.5
     canvasImgAlpha = canvasL+canvasM
-
-    plt.imshow((imgLMMask*LMMmaskMultiplier*canvasM).astype('int'))
-    plt.show()
-    plt.imshow((imgLMMask*(1-LMMmaskMultiplier)*canvasL).astype('int'))
-    plt.show()
-    plt.imshow((imgLMMask*LMMmaskMultiplier*canvasM).astype('int')+(imgLMMask*(1-LMMmaskMultiplier)*canvasL).astype('int'))
-    plt.show()
 
     canvasImgAlpha[imgLMMask] = (imgLMMask*LMMmaskMultiplier*canvasM+imgLMMask*(1-LMMmaskMultiplier)*canvasL)[imgLMMask]
     canvasR[imgRMMask] = (imgRMMask*(RMMmaskMultiplier)*canvasR)[imgRMMask]
