@@ -5,7 +5,7 @@ from corner_detector import *
 from anms import *
 from feat_match import *
 from ransac_est_homography import *
-from cylindrical_projection import *
+#from cylindrical_projection import *
 from stitch_image import *
 from warp_img_perspective import *
 
