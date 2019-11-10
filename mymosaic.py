@@ -9,19 +9,35 @@ sys.path.append('gradient_blending')
 from seamlessCloningPoisson import *
 from warp_image import *
 
-def mymosaic(imgL, imgM, imgR, HLM, HMR):
+def mymosaic(imgL, imgM, imgR, HLM, HRM):
     widthMultiplier = 3
     heightMultiplier = 3
     cornersL = np.asarray([[0,0,1],[0,imgL.shape[0],1],[imgL.shape[1],0,1],[imgL.shape[1],imgL.shape[0],1]]).T
 
-    cornersT = np.matmul(HLM,cornersL)
-    cornersT = cornersT/cornersT[-1,:]
-    cornersT = cornersT
-    xmax = np.max(cornersT[0,:])
-    xmin = np.min(cornersT[0,:])
-    ymax = np.max(cornersT[1,:])
-    ymin = np.min(cornersT[1,:])
-    T = [[1, 0, max(0,-xmin)], [0, 1, max(0,-ymin)], [0, 0, 1]]
+    cornersLT = np.matmul(HLM,cornersL)
+    cornersLT = cornersLT/cornersLT[-1,:]
+    xmax = np.max(cornersLT[0,:])
+    xmin = np.min(cornersLT[0,:])
+    ymax = np.max(cornersLT[1,:])
+    ymin = np.min(cornersLT[1,:])
+    _x = int(abs(max(0,-xmin)))
+    _y = int(abs(max(0,-ymin)))
+
+    T = [[1, 0, _x], [0, 1, _y], [0, 0, 1]]
+
+    # offsetX = int(_x)
+    # offsetY = int(_y)
+    # T = [[1, 0, offsetX], [0, 1, offsetY], [0, 0, 1]]
+
+    cornersR = np.asarray([[0,0,1],[0,imgR.shape[0],1],[imgR.shape[1],0,1],[imgR.shape[1],imgR.shape[0],1]]).T
+    cornersRT = np.matmul(T@HRM,cornersR)
+    cornersRT = cornersRT/cornersRT[-1,:]
+
+    canvasMaxWidth = int(np.max(cornersRT[0:]))
+    canvasMaxHeight = int(max(np.max(cornersRT[1:]),ymax))
+    print(canvasMaxWidth)
+    print(canvasMaxHeight)
+
     imgLMask = np.ones((imgL.shape))
     imgRMask = np.ones((imgR.shape))
 
@@ -31,24 +47,17 @@ def mymosaic(imgL, imgM, imgR, HLM, HMR):
     imgOutline[0:imgOutline.shape[0]-1,0] = 1
     imgOutline[0:imgOutline.shape[0]-1,imgOutline.shape[1]-1] = 1
 
-    canvasL = warp_image(imgL, T@HLM,int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
-    imgLMask = warp_image(imgLMask, T@HLM,int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
-    outlineL = warp_image(imgOutline, T@HLM,int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
+    canvasL = warp_image(imgL, T@HLM,canvasMaxWidth,canvasMaxHeight)
+    imgLMask = warp_image(imgLMask, T@HLM,canvasMaxWidth,canvasMaxHeight)
+    outlineL = warp_image(imgOutline, T@HLM,canvasMaxWidth,canvasMaxHeight)
 
     outlineL = outlineL.astype('bool')
 
     imgMMask = np.zeros((imgLMask.shape))
 
-    _x = int(abs(max(0,-xmin)))
-    _y = int(abs(max(0,-ymin)))
-
-    offsetX = int(_x)
-    offsetY = int(_y)
-    T = [[1, 0, offsetX], [0, 1, offsetY], [0, 0, 1]]
-
-    canvasR = warp_image(imgR, T@np.linalg.inv(HMR),int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
-    imgRMask = warp_image(imgRMask, T@np.linalg.inv(HMR),int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
-    outlineR = warp_image(imgOutline, T@np.linalg.inv(HMR),int(imgL.shape[1]*widthMultiplier),int(imgL.shape[0]*heightMultiplier))
+    canvasR = warp_image(imgR, T@HRM,canvasMaxWidth,canvasMaxHeight)
+    imgRMask = warp_image(imgRMask, T@HRM,canvasMaxWidth,canvasMaxHeight)
+    outlineR = warp_image(imgOutline, T@HRM,canvasMaxWidth,canvasMaxHeight)
     outlineR = outlineR.astype('bool')
 
     canvasM = np.zeros((canvasL.shape))
@@ -72,7 +81,6 @@ def mymosaic(imgL, imgM, imgR, HLM, HMR):
 
     LMMAlphas = np.linspace(0,1,LMMaskEndX-LMMaskStartX)
     LMMX, LMMY = np.meshgrid(LMMAlphas, np.arange(0,LMMaskEndY-LMMaskStartY))
-    print(LMMX.shape)
     LMMmaskMultiplier = np.zeros((imgLMMask.shape))
     LMMmaskMultiplier[LMMaskStartY:LMMaskEndY,LMMaskStartX:LMMaskEndX,0] = LMMX
     LMMmaskMultiplier[LMMaskStartY:LMMaskEndY,LMMaskStartX:LMMaskEndX,1] = LMMX
@@ -86,7 +94,6 @@ def mymosaic(imgL, imgM, imgR, HLM, HMR):
 
     RMMAlphas = np.linspace(0,1,RMMaskEndX-RMMaskStartX)
     RMMX, RMMY = np.meshgrid(RMMAlphas, np.arange(0,RMMaskEndY-RMMaskStartY))
-    print(RMMX.shape)
     RMMmaskMultiplier = np.zeros((imgRMMask.shape))
     RMMmaskMultiplier[RMMaskStartY:RMMaskEndY,RMMaskStartX:RMMaskEndX,0] = RMMX
     RMMmaskMultiplier[RMMaskStartY:RMMaskEndY,RMMaskStartX:RMMaskEndX,1] = RMMX
