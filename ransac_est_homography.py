@@ -41,7 +41,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
         i += 1
     ptindices = []
     inlier_ind = []
-    H1 = np.zeros([3,3])
     for i in range(ranIter):
         At = np.zeros([8,9])
         indexList = list(range(N))
@@ -53,7 +52,6 @@ def ransac_est_homography(x, y, X, Y, threshold):
             At[2*j,:]=A[2*ind,:]
             At[2*j +1,:] = A[2*ind+1,:]
         [u,d,v] = np.linalg.svd(At,full_matrices=True)
-        minIdx = np.min(d)
         Ht = v[-1,:]/v[-1,-1]
         H = Ht.reshape(3,3)
         vPtsPred = np.matmul(H,uPtsFull)
@@ -63,14 +61,10 @@ def ransac_est_homography(x, y, X, Y, threshold):
         inlierCount = np.sum(1*inliers)
         distanceSum = np.sum(distances)
         if (maxInlierCount==inlierCount and distanceSum < minDistanceSum) or maxInlierCount<inlierCount:
-            # print(H)
-            # print(distanceSum,end=" ")
-            # print(inlierCount)
             maxInlierCount = inlierCount
             minDistanceSum = distanceSum
             ptindices = np.argwhere(inliers==1)
             inlier_ind = inliers
-            H1 = H
     ptindices = ptindices[:,0]
     j=0
     Anew = np.zeros([2*ptindices.shape[0],9])
