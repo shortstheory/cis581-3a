@@ -51,6 +51,13 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     imgLMask = warp_image(imgLMask, T@HLM,canvasMaxWidth,canvasMaxHeight)
     outlineL = warp_image(imgOutline, T@HLM,canvasMaxWidth,canvasMaxHeight)
 
+    # plt.imshow(cv2.cvtColor(canvasL,cv2.COLOR_BGR2RGB))
+    # plt.show()
+    plt.imshow(imgLMask)
+    plt.show()
+    plt.imshow(outlineL)
+    plt.show()
+
     outlineL = outlineL.astype('bool')
 
     imgMMask = np.zeros((imgLMask.shape))
@@ -105,13 +112,17 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     alpha = 0.5
     canvasImgAlpha = canvasL+canvasM
 
+    plt.imshow((imgLMMask*LMMmaskMultiplier*canvasM).astype('int'))
+    plt.show()
+    plt.imshow((imgLMMask*(1-LMMmaskMultiplier)*canvasL).astype('int'))
+    plt.show()
+    plt.imshow((imgLMMask*LMMmaskMultiplier*canvasM).astype('int')+(imgLMMask*(1-LMMmaskMultiplier)*canvasL).astype('int'))
+    plt.show()
+
     canvasImgAlpha[imgLMMask] = (imgLMMask*LMMmaskMultiplier*canvasM+imgLMMask*(1-LMMmaskMultiplier)*canvasL)[imgLMMask]
     canvasR[imgRMMask] = (imgRMMask*(RMMmaskMultiplier)*canvasR)[imgRMMask]
 
     canvasImgAlpha[imgRMMask] = (imgRMMask*(1-RMMmaskMultiplier)*canvasImgAlpha)[imgRMMask]
     canvasImgAlpha=canvasImgAlpha+canvasR
-
-    canvasImgAlpha[outlineL] = cv2.dilate(canvasImgAlpha.copy(),kernel,iterations=1)[outlineL.astype('bool')]
-    canvasImgAlpha[outlineR] = cv2.dilate(canvasImgAlpha.copy(),kernel,iterations=1)[outlineR.astype('bool')]
     return canvasImgAlpha
 
