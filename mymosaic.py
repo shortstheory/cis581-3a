@@ -10,8 +10,8 @@ from seamlessCloningPoisson import *
 from warp_image import *
 
 def mymosaic(imgL, imgM, imgR, HLM, HMR):
-    widthMultiplier = 2.5
-    heightMultiplier = 1.5
+    widthMultiplier = 3
+    heightMultiplier = 3
     cornersL = np.asarray([[0,0,1],[0,imgL.shape[0],1],[imgL.shape[1],0,1],[imgL.shape[1],imgL.shape[0],1]]).T
 
     cornersT = np.matmul(HLM,cornersL)
