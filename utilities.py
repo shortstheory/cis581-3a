@@ -7,7 +7,6 @@ from feat_match import *
 from ransac_est_homography import *
 from matplotlib import pyplot as plt
 
-
 def interp2(v, xq, yq):
     if len(xq.shape) == 2 or len(yq.shape) == 2:
         dim_input = 2

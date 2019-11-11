@@ -5,7 +5,7 @@ import math
 from matplotlib import pyplot as plt
 import sys
 from scipy.ndimage import gaussian_filter
-from warp_image import *
+import utilities
 
 def mymosaic(imgL, imgM, imgR, HLM, HRM):
     widthMultiplier = 3
@@ -22,10 +22,6 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     _y = int(abs(max(0,-ymin)))
 
     T = [[1, 0, _x], [0, 1, _y], [0, 0, 1]]
-
-    # offsetX = int(_x)
-    # offsetY = int(_y)
-    # T = [[1, 0, offsetX], [0, 1, offsetY], [0, 0, 1]]
 
     cornersR = np.asarray([[0,0,1],[0,imgR.shape[0],1],[imgR.shape[1],0,1],[imgR.shape[1],imgR.shape[0],1]]).T
     cornersRT = np.matmul(T@HRM,cornersR)
@@ -44,21 +40,21 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     imgOutline[0:imgOutline.shape[0]-1,0] = 1
     imgOutline[0:imgOutline.shape[0]-1,imgOutline.shape[1]-1] = 1
 
-    canvasL = warp_image(imgL, T@HLM,canvasMaxWidth,canvasMaxHeight)
-    imgLMask = warp_image(imgLMask, T@HLM,canvasMaxWidth,canvasMaxHeight)
-    outlineL = warp_image(imgOutline, T@HLM,canvasMaxWidth,canvasMaxHeight)
+    canvasL = utilities.warp_image(imgL, T@HLM,canvasMaxWidth,canvasMaxHeight)
+    imgLMask = utilities.warp_image(imgLMask, T@HLM,canvasMaxWidth,canvasMaxHeight)
+    outlineL = utilities.warp_image(imgOutline, T@HLM,canvasMaxWidth,canvasMaxHeight)
 
     outlineL = outlineL.astype('bool')
 
     imgMMask = np.zeros((imgLMask.shape))
 
-    canvasR = warp_image(imgR, T@HRM,canvasMaxWidth,canvasMaxHeight)
-    imgRMask = warp_image(imgRMask, T@HRM,canvasMaxWidth,canvasMaxHeight)
-    outlineR = warp_image(imgOutline, T@HRM,canvasMaxWidth,canvasMaxHeight)
+    canvasR = utilities.warp_image(imgR, T@HRM,canvasMaxWidth,canvasMaxHeight)
+    imgRMask = utilities.warp_image(imgRMask, T@HRM,canvasMaxWidth,canvasMaxHeight)
+    outlineR = utilities.warp_image(imgOutline, T@HRM,canvasMaxWidth,canvasMaxHeight)
     outlineR = outlineR.astype('bool')
 
     canvasM = np.zeros((canvasL.shape))
-    canvasImgAlpha = np.zeros((canvasL.shape))
+    canvasFeathered = np.zeros((canvasL.shape))
     canvasM[_y:_y+imgM.shape[0],_x:_x+imgM.shape[1]]=imgM   
 
     imgMMask = np.zeros((imgLMask.shape))
@@ -99,13 +95,12 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     imgLMMask = imgLMMask.astype('bool')
     imgRMMask = imgRMMask.astype('bool')
 
-    alpha = 0.5
-    canvasImgAlpha = canvasL+canvasM
+    canvasFeathered = canvasL+canvasM
 
-    canvasImgAlpha[imgLMMask] = (imgLMMask*LMMmaskMultiplier*canvasM+imgLMMask*(1-LMMmaskMultiplier)*canvasL)[imgLMMask]
+    canvasFeathered[imgLMMask] = (imgLMMask*LMMmaskMultiplier*canvasM+imgLMMask*(1-LMMmaskMultiplier)*canvasL)[imgLMMask]
     canvasR[imgRMMask] = (imgRMMask*(RMMmaskMultiplier)*canvasR)[imgRMMask]
 
-    canvasImgAlpha[imgRMMask] = (imgRMMask*(1-RMMmaskMultiplier)*canvasImgAlpha)[imgRMMask]
-    canvasImgAlpha=canvasImgAlpha+canvasR
-    return canvasImgAlpha
+    canvasFeathered[imgRMMask] = (imgRMMask*(1-RMMmaskMultiplier)*canvasFeathered)[imgRMMask]
+    canvasFeathered=canvasFeathered+canvasR
+    return canvasFeathered
 
