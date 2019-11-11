@@ -29,4 +29,4 @@ python3 demo.py
 will create a panorama of Shoemaker's Green from the images in the `images/` folder.
 (Please change the filename and path appropriately for testing on other images)
 
-The other option is to open `demo.ipynb` in VS Code or Jupyter Notebooks in a browser for an interactive demo of the project.
+The other option is to open `demo.ipynb` in VS Code or Jupyter Notebooks in a browser for an interactive demo of the project, generating plots for each intermediate step.

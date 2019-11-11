@@ -28,7 +28,6 @@ def feat_desc(img, x, y):
         _x = int(_x)
         _y = int(_y)
         patch = padImage[_y:_y+40,_x:_x+40]
-        blurredPatch = cv2.GaussianBlur(patch,(5,5),1)
         desc = []
         for i in range(0,40,5):
             for j in range(0,40,5):

@@ -19,7 +19,7 @@ import sys
 def ransac_est_homography(x, y, X, Y, threshold):
     N = x.size
     A = np.zeros([2 * N, 9])
-    ranIter = 10000
+    ranIter = 1000
     ux = x.reshape(-1,N)
     uy = y.reshape(-1,N)
     uz = np.ones(N).reshape(-1,N)
