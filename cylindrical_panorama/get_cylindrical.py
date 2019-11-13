@@ -3,7 +3,7 @@ from skimage.io import imsave
 import numpy as np
 from matplotlib import pyplot as plt
 
-def get_cylindrical(img1,img2,img3,f):
+def get_cylindrical(img1,img2,img3,f,R):
     imgs = [img1,img2,img3]
     number = 1
     for img1 in imgs:
@@ -12,8 +12,8 @@ def get_cylindrical(img1,img2,img3,f):
         edgecenters = np.asarray([[0,img1.shape[0]/2],[img1.shape[1]/2,0],[img1.shape[1],img1.shape[0]/2],[img1.shape[1]/2,img1.shape[0]],[0,0],[0,img1.shape[0]],[img1.shape[1],0],[img1.shape[1],img1.shape[0]]])
         x_ecs = edgecenters[:,0]
         y_ecs = edgecenters[:,1]
-        x_ecsT = f*np.arctan((x_ecs-xc)/f) + xc			#Finding the transformed coordinates of the extreme points
-        y_ecsT = (y_ecs-yc)*f/(np.sqrt((x_ecs-xc)**2 + f**2))+yc
+        x_ecsT = R*np.arctan((x_ecs-xc)/f) + xc			#Finding the transformed coordinates of the extreme points
+        y_ecsT = (y_ecs-yc)*R/(np.sqrt((x_ecs-xc)**2 + f**2))+yc
         xmax = int(np.max(x_ecsT))
         xmin = int(np.min(x_ecsT))
         ymax = int(np.max(y_ecsT))
@@ -25,8 +25,8 @@ def get_cylindrical(img1,img2,img3,f):
         yT_r = np.array(range(sizey))
         yT_r = yT_r+ymin
         XT,YT = np.meshgrid(xT_r,yT_r)
-        X_og = np.tan((XT-xc)/f)*f + xc				#Applying inverse transformation to map to the original coordinate
-        Y_og = (YT - yc)*np.sqrt((X_og-xc)**2 + f**2)/f + yc	
+        X_og = np.tan((XT-xc)/R)*f + xc				#Applying inverse transformation to map to the original coordinate
+        Y_og = (YT - yc)*np.sqrt((X_og-xc)**2 + f**2)/R + yc
         im1BT = interp2(img1[:,:,0],X_og,Y_og)			#Getting the intensities at the respective locations by interpolation
         im1GT = interp2(img1[:,:,1],X_og,Y_og)
         im1RT = interp2(img1[:,:,2],X_og,Y_og)
