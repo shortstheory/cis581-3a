@@ -7,7 +7,7 @@ import sys
 from scipy.ndimage import gaussian_filter
 import utilities
 
-def mymosaic(imgL, imgM, imgR, HLM, HRM):
+def mymosaic(imgL, imgM, imgR, HLM, HRM, autoCanvasSize=True):
     widthMultiplier = 3
     heightMultiplier = 3
     cornersL = np.asarray([[0,0,1],[0,imgL.shape[0],1],[imgL.shape[1],0,1],[imgL.shape[1],imgL.shape[0],1]]).T
@@ -27,8 +27,13 @@ def mymosaic(imgL, imgM, imgR, HLM, HRM):
     cornersRT = np.matmul(T@HRM,cornersR)
     cornersRT = cornersRT/cornersRT[-1,:]
 
-    canvasMaxWidth = int(np.max(cornersRT[0:]))
-    canvasMaxHeight = int(max(np.max(cornersRT[1:]),ymax))
+    canvasMaxWidth = 1200
+    canvasMaxHeight = 800
+    
+    if autoCanvasSize:
+        canvasMaxWidth = int(np.max(cornersRT[0:]))
+        canvasMaxHeight = int(max(np.max(cornersRT[1:]),ymax))
+        
     print("Canvas Size: " + str(canvasMaxWidth)+"x"+str(canvasMaxHeight))
 
     imgLMask = np.ones((imgL.shape))
