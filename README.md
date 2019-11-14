@@ -1,6 +1,6 @@
-# CIS 581 Project 3A
+CIS 581 Project 3A Extra credit: Cylindrical Panorama
+- Arnav Dhamija and Saumya Shah
 
-**Team Members:** Arnav Dhamija and Saumya Shah
 
 This project has been documented in the included PDF.
 
@@ -12,6 +12,7 @@ The code can be divided into the following files:
 * `anms.py`: does adaptive non-maximum suppression to obtain a balanced distribution of N keypoints
 * `feat_desc.py`: create a 64xN matrix of feature vectors for the keypoints and image.
 * `feat_match.py`: matches keypoints between two images using FLANN. This function also returns dMatch, which is a list of objects which are used for generating the RANSAC plots for the matching in the later code. This may be removed when performing the individual function testing.
+* `get_cylindrical.py`: Generates the cylindrical projections of the passed images and stores them as 'cylin1.jpeg','cylin2.jpeg','cylin3.jpeg' respectively in the working directory.
 * `ransac_est_homography.py`: uses RANSAC to find good inliers and to construct a homography matrix
 * `utilities.py`: the helper file which contains functions for warping images and a wrapper function `get_homography` which executes all of the above functions.
 * `mymosaic.py`: alpha blends and feathers the images according to the provided homographies.
