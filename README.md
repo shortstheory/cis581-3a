@@ -16,10 +16,33 @@ The code can be divided into the following files:
 * `ransac_est_homography.py`: uses RANSAC to find good inliers and to construct a homography matrix
 * `utilities.py`: the helper file which contains functions for warping images and a wrapper function `get_homography` which executes all of the above functions.
 * `mymosaic.py`: alpha blends and feathers the images according to the provided homographies.
+* `record.sh`: records videos from 3 connected webcams at once.
+* `get_frames.sh`: splits the videos found in the `vids/` folder into its individual frames
+* `stitch_video_frames.py`: creates a video from the frames we found by running the above shell scripts
+* `create_video.sh`: creates a video from the frames generated in the previous step
 
 Images we used can be found in `images/`, and different approaches we experimented with can be found in `variations/`. The `results/` folder has a subfolder for each set of images with intermediate outputs with each step. The `results/`, folder contains the resulting images obtained at each step for each of our images. The `results/shoemaker/` folder contains the results from the images of the Franklin Field.
 
+### Extra Credit
+
+Results for the cyldrical projection and the video projection can be found in `extra_credit_cylindrical_results` and `extra_credit_video_results` respectively.
+
 ## Running the Code
+
+### Extra Credit
+
+For cylindrical projection, run:
+```
+python3 cylindrical_demo.py
+```
+For video projection, run:
+```
+./getframes.sh 
+./stitch_video_frames.py
+./create_video.sh
+```
+
+### Regular Credit
 
 The code can be run in two ways:
 

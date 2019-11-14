@@ -17,9 +17,16 @@ To record a video use:
 and then:
 
 ```bash
-./getframes.sh && ./make_video && ./create_video
+./getframes.sh && ./stitch_video_frames.py && ./create_video
 ```
 
+The above can be run directly by doing:
+
+```bash
+./video_demo.sh
+```
+
+As this can take a lot of time, the video I generated in my testing can be found in `extra_credit_video_results/output.mp4`.
 
 
 ## Explanation
@@ -43,7 +50,7 @@ Unfortunately, I realized after some testing that since the three webcams had va
 The next step involved taking the three video and splitting into frames. This was done using `getframes.sh` which would take the three videos and store their JPEGs in `left`, `middle` and `right` directories:
 
 ```bash
-#getframes.sh
+#get_frames.sh
 rm *.jpg
 rm -rf left
 rm -rf middle
